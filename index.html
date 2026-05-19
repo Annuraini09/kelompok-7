@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Voting RT/RW</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    header h2 {
+      font-size: 28px;
+      margin: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .section {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    @media (min-width: 768px) {
+      .section { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .card h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+    .card p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    .btn-tertiary {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    .hide { display: none !important; }
+    
+    .page { display: none; }
+    .page.active { display: block; }
+    
+    .form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    .form-container button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .form-container button:hover {
+      opacity: 0.9;
+    }
+    .alert {
+      padding: 12px 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .alert.error {
+      background: #ffebee;
+      color: #d32f2f;
+      border-left: 4px solid #d32f2f;
+    }
+    .alert.success {
+      background: #e8f5e9;
+      color: #388e3c;
+      border-left: 4px solid #388e3c;
+    }
+    .candidate-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    @media (min-width: 768px) {
+      .candidate-list { grid-template-columns: repeat(2, 1fr); }
+    }
+    .candidate-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .candidate-card h4 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .candidate-card p {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 15px;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      color: #667eea;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .back-btn:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>🗳️ E-Voting RT/RW</h2>
+</header>
+
+<div class="container">
+  
+  <!-- HOME PAGE -->
+  <div id="homePage" class="page active">
+    <div class="section" style="margin-top: 40px;">
+      <div class="card">
+        <h3>👨‍💼 Admin</h3>
+        <p>Login sebagai admin untuk mengelola akun warga dan memantau pemilihan</p>
+        <a href="admin-login.html" class="btn">Masuk sebagai Admin</a>
+      </div>
+      
+      <div class="card">
+        <h3>🗳️ Pemilih</h3>
+        <p>Login sebagai warga untuk memilih calon RT/RW pilihan Anda</p>
+        <button class="btn" onclick="goToVoterLogin()">Masuk sebagai Pemilih</button>
+      </div>
+
+      <div class="card">
+        <h3>📊 Calon</h3>
+        <p>Login sebagai calon untuk memantau perolehan suara Anda</p>
+        <a href="candidate-login.html" class="btn btn-tertiary">Masuk sebagai Calon</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOTER LOGIN PAGE -->
+  <div id="voterLoginPage" class="page">
+    <div class="form-container">
+      <h2 style="text-align: center; margin-bottom: 30px;">Login Pemilih</h2>
+      
+      <div id="loginMsg" class="alert"></div>
+
+      <form onsubmit="handleVoterLogin(event)">
+        <div class="form-group">
+          <label for="nik">NIK (Nomor Induk Kependudukan)</label>
+          <input type="text" id="nik" name="nik" placeholder="Masukkan NIK" required>
+        </div>
+
+        <div class="form-group">
+          <label for="voterPassword">Password</label>
+          <input type="password" id="voterPassword" name="voterPassword" placeholder="Masukkan password" required>
+        </div>
+
+        <button type="submit">Login</button>
+      </form>
+
+      <a href="#" onclick="backToHome()" class="back-btn">← Kembali</a>
+    </div>
+  </div>
+
+  <!-- VOTER HOME PAGE -->
+  <div id="voterHomePage" class="page">
+    <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <h2 style="text-align: center; margin-bottom: 10px;" id="welcomeMsg"></h2>
+      <p style="text-align: center; color: #666; margin-bottom: 20px;" id="statusMsg"></p>
+      
+      <div style="text-align: center;">
+        <button class="btn" onclick="goToCandidates()">Lihat Calon</button>
+        <button class="btn btn-secondary" onclick="logoutVoter()" style="margin-top: 10px;">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANDIDATES PAGE -->
+  <div id="candidatesPage" class="page">
+    <h2 style="text-align: center; margin: 20px 0; color: #333;">Daftar Calon RT/RW</h2>
+    
+    <div id="candidateMsg" class="alert"></div>
+
+    <div id="candidateList" class="candidate-list"></div>
+
+    <div style="text-align: center;">
+      <button class="btn btn-secondary" onclick="backToVoterHome()" style="margin-top: 20px;">← Kembali</button>
+    </div>
+  </div>
+
+  <!-- RESULTS PAGE -->
+  <div id="resultsPage" class="page">
+    <h2 style="text-align: center; margin: 20px 0; color: #333;">Vote Berhasil!</h2>
+    
+    <div style="background: #e8f5e9; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0;">
+      <p style="color: #388e3c; font-size: 16px; font-weight: 600;">✓ Terima kasih telah melakukan voting!</p>
+    </div>
+
+    <div style="text-align: center;">
+      <button class="btn btn-secondary" onclick="logoutVoter()">Selesai</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let voterSession = null;
+
+  function goToVoterLogin() {
+    document.getElementById('homePage').classList.remove('active');
+    document.getElementById('voterLoginPage').classList.add('active');
+  }
+
+  function backToHome() {
+    document.getElementById('voterLoginPage').classList.remove('active');
+    document.getElementById('voterHomePage').classList.remove('active');
+    document.getElementById('candidatesPage').classList.remove('active');
+    document.getElementById('homePage').classList.add('active');
+  }
+
+  async function handleVoterLogin(event) {
+    event.preventDefault();
+    
+    const nik = document.getElementById('nik').value.trim();
+    const password = document.getElementById('voterPassword').value.trim();
+    const msg = document.getElementById('loginMsg');
+    const btn = event.target.querySelector('button');
+
+    if (!nik || !password) {
+      showAlert(msg, 'error', 'NIK dan password harus diisi!');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Memproses...';
+
+    try {
+      const response = await fetch('backend/api.php?action=voter_login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nik, password })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        voterSession = data;
+        showAlert(msg, 'success', 'Login berhasil!');
+        
+        setTimeout(() => {
+          document.getElementById('voterLoginPage').classList.remove('active');
+          document.getElementById('voterHomePage').classList.add('active');
+          document.getElementById('welcomeMsg').textContent = `Selamat datang, ${data.voter_id}!`;
+          document.getElementById('statusMsg').textContent = data.has_voted 
+            ? '✓ Anda sudah melakukan voting.' 
+            : 'Anda dapat memilih calon RT/RW Anda sekarang.';
+        }, 1000);
+      } else {
+        showAlert(msg, 'error', data.error || 'Login gagal!');
+      }
+    } catch (error) {
+      showAlert(msg, 'error', 'Terjadi kesalahan: ' + error.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Login';
+    }
+  }
+
+  async function goToCandidates() {
+    if (voterSession.has_voted) {
+      alert('Anda sudah melakukan voting!');
+      return;
+    }
+
+    document.getElementById('voterHomePage').classList.remove('active');
+    document.getElementById('candidatesPage').classList.add('active');
+
+    await loadCandidates();
+  }
+
+  async function loadCandidates() {
+    const list = document.getElementById('candidateList');
+    const msg = document.getElementById('candidateMsg');
+
+    try {
+      const response = await fetch('backend/api.php?action=list_candidates');
+      const candidates = await response.json();
+
+      if (!candidates.length) {
+        showAlert(msg, 'error', 'Tidak ada calon tersedia');
+        return;
+      }
+
+      list.innerHTML = candidates.map(c => `
+        <div class="candidate-card">
+          <h4>${c.name}</h4>
+          <p>${c.description || 'Calon RT/RW'}</p>
+          <p style="color: #667eea; font-weight: 600; font-size: 16px;">${c.votes || 0} suara</p>
+          <button class="btn" onclick="voteCandidate(${c.id})">Pilih</button>
+        </div>
+      `).join('');
+    } catch (error) {
+      showAlert(msg, 'error', 'Gagal memuat calon: ' + error.message);
+    }
+  }
+
+  async function voteCandidate(candidateId) {
+    if (!voterSession) {
+      alert('Session tidak valid, silakan login kembali');
+      return;
+    }
+
+    try {
+      const response = await fetch('backend/api.php?action=submit_vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ candidate_id: candidateId })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        voterSession.has_voted = true;
+        document.getElementById('candidatesPage').classList.remove('active');
+        document.getElementById('resultsPage').classList.add('active');
+      } else {
+        alert(data.error || 'Gagal melakukan voting');
+      }
+    } catch (error) {
+      alert('Terjadi kesalahan: ' + error.message);
+    }
+  }
+
+  function backToVoterHome() {
+    document.getElementById('candidatesPage').classList.remove('active');
+    document.getElementById('voterHomePage').classList.add('active');
+  }
+
+  async function logoutVoter() {
+    await fetch('backend/api.php?action=logout');
+    voterSession = null;
+    document.getElementById('voterHomePage').classList.remove('active');
+    document.getElementById('voterLoginPage').classList.remove('active');
+    document.getElementById('candidatesPage').classList.remove('active');
+    document.getElementById('resultsPage').classList.remove('active');
+    document.getElementById('homePage').classList.add('active');
+    
+    // Reset form
+    document.getElementById('nik').value = '';
+    document.getElementById('voterPassword').value = '';
+  }
+
+  function showAlert(element, type, text) {
+    element.className = 'alert ' + type;
+    element.textContent = text;
+    element.style.display = 'block';
+  }
+</script>
+
+</body>
+</html>

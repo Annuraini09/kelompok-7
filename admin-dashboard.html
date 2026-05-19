@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin - E-Voting RT/RW</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    header h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+    header .user-info {
+      margin-top: 10px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    header button {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      float: right;
+      margin-top: 10px;
+    }
+    header button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    .section {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      color: #333;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .form-row.full {
+      grid-template-columns: 1fr;
+    }
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .alert {
+      padding: 12px 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .alert.error {
+      background: #ffebee;
+      color: #d32f2f;
+      border-left: 4px solid #d32f2f;
+    }
+    .alert.success {
+      background: #e8f5e9;
+      color: #388e3c;
+      border-left: 4px solid #388e3c;
+    }
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    table th {
+      background: #f5f5f5;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #ddd;
+    }
+    table td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+    table tr:hover {
+      background: #f9f9f9;
+    }
+    .status {
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status.yes {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+    .status.no {
+      background: #ffebee;
+      color: #d32f2f;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1>Dashboard Admin</h1>
+      <div class="user-info">Kelola Akun Warga & Pemilihan</div>
+    </div>
+    <button onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+  
+  <!-- Buat Akun Warga -->
+  <div class="section">
+    <h2>Buat Akun Warga</h2>
+    
+    <div id="formMsg" class="alert"></div>
+
+    <form id="createVoterForm" onsubmit="handleCreateVoter(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="nik">NIK</label>
+          <input type="text" id="nik" name="nik" placeholder="Masukkan NIK (16 digit)" required>
+        </div>
+        <div class="form-group">
+          <label for="name">Nama Lengkap</label>
+          <input type="text" id="name" name="name" placeholder="Masukkan nama lengkap" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Konfirmasi Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Konfirmasi password" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rt">RT</label>
+          <input type="text" id="rt" name="rt" placeholder="Nomor RT (opsional)">
+        </div>
+        <div class="form-group">
+          <label for="rw">RW</label>
+          <input type="text" id="rw" name="rw" placeholder="Nomor RW (opsional)">
+        </div>
+      </div>
+
+      <button type="submit" style="width: auto;">Buat Akun</button>
+    </form>
+  </div>
+
+  <!-- Daftar Warga -->
+  <div class="section">
+    <h2>Daftar Warga Terdaftar</h2>
+    
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>NIK</th>
+            <th>Nama</th>
+            <th>RT/RW</th>
+            <th>Sudah Vote</th>
+            <th>Dibuat</th>
+          </tr>
+        </thead>
+        <tbody id="voterTable">
+          <tr><td colspan="5" class="loading">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Check if admin is logged in
+  function checkAdminLogin() {
+    // This would check if session is valid
+    // For now, we assume admin is logged in if they can access this page
+  }
+
+  async function handleCreateVoter(event) {
+    event.preventDefault();
+    
+    const nik = document.getElementById('nik').value.trim();
+    const name = document.getElementById('name').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+    const rt = document.getElementById('rt').value.trim();
+    const rw = document.getElementById('rw').value.trim();
+    const formMsg = document.getElementById('formMsg');
+    const btn = event.target.querySelector('button');
+
+    if (!nik || !name || !password) {
+      showMessage(formMsg, 'error', 'NIK, nama, dan password wajib diisi!');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showMessage(formMsg, 'error', 'Password tidak cocok!');
+      return;
+    }
+
+    if (password.length < 6) {
+      showMessage(formMsg, 'error', 'Password minimal 6 karakter!');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Memproses...';
+
+    try {
+      const response = await fetch('backend/api.php?action=admin_create_voter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nik, name, password, rt, rw })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showMessage(formMsg, 'success', 'Akun warga berhasil dibuat!');
+        document.getElementById('createVoterForm').reset();
+        loadVoterList();
+        setTimeout(() => formMsg.style.display = 'none', 3000);
+      } else {
+        showMessage(formMsg, 'error', data.error || 'Gagal membuat akun!');
+      }
+    } catch (error) {
+      showMessage(formMsg, 'error', 'Terjadi kesalahan: ' + error.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Buat Akun';
+    }
+  }
+
+  async function loadVoterList() {
+    const table = document.getElementById('voterTable');
+    
+    try {
+      const response = await fetch('backend/api.php?action=admin_get_voters');
+      const voters = await response.json();
+
+      if (voters.length === 0) {
+        table.innerHTML = '<tr><td colspan="5" class="loading">Belum ada warga terdaftar</td></tr>';
+        return;
+      }
+
+      table.innerHTML = voters.map(voter => `
+        <tr>
+          <td>${voter.nik}</td>
+          <td>${voter.name}</td>
+          <td>${voter.rt || '-'} / ${voter.rw || '-'}</td>
+          <td>
+            <span class="status ${voter.has_voted ? 'yes' : 'no'}">
+              ${voter.has_voted ? 'Ya' : 'Belum'}
+            </span>
+          </td>
+          <td>${new Date(voter.created_at).toLocaleDateString('id-ID')}</td>
+        </tr>
+      `).join('');
+    } catch (error) {
+      table.innerHTML = '<tr><td colspan="5" class="loading">Gagal memuat data: ' + error.message + '</td></tr>';
+    }
+  }
+
+  function showMessage(element, type, text) {
+    element.className = 'alert ' + type;
+    element.textContent = text;
+    element.style.display = 'block';
+  }
+
+  function logout() {
+    if (confirm('Yakin ingin logout?')) {
+      fetch('backend/api.php?action=logout');
+      window.location.href = 'admin-login.html';
+    }
+  }
+
+  // Load voter list on page load
+  window.addEventListener('load', loadVoterList);
+</script>
+
+</body>
+</html>

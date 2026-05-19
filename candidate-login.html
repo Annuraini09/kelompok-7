@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Calon - E-Voting RT/RW</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+    .card h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .error {
+      color: #d32f2f;
+      background: #ffebee;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .success {
+      color: #388e3c;
+      background: #e8f5e9;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .links {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    .links a {
+      color: #667eea;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+    .links a:hover {
+      text-decoration: underline;
+    }
+    .info {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 15px;
+      border-radius: 5px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      border-left: 4px solid #1976d2;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2>Login Calon</h2>
+    
+    <div class="info">
+      <strong>Informasi:</strong> Masukkan ID calon yang Anda terima dari penyelenggara.
+    </div>
+    
+    <div id="errorMsg" class="error"></div>
+    <div id="successMsg" class="success"></div>
+
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label for="candidateId">ID Calon</label>
+        <input type="number" id="candidateId" name="candidateId" placeholder="Masukkan ID calon" min="1" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+      </div>
+
+      <button type="submit">
+        <span class="normal">Login</span>
+      </button>
+    </form>
+
+    <div class="links">
+      <a href="index.html">← Kembali</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function handleLogin(event) {
+    event.preventDefault();
+    
+    const candidateId = parseInt(document.getElementById('candidateId').value.trim());
+    const password = document.getElementById('password').value.trim();
+    const errorMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+    const btn = event.target.querySelector('button');
+    
+    if (!candidateId || !password) {
+      errorMsg.textContent = 'ID calon dan password harus diisi!';
+      errorMsg.style.display = 'block';
+      successMsg.style.display = 'none';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Memproses...';
+
+    try {
+      const response = await fetch('backend/api.php?action=candidate_login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ candidate_id: candidateId, password })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        successMsg.textContent = 'Login berhasil! Mengarahkan...';
+        successMsg.style.display = 'block';
+        errorMsg.style.display = 'none';
+        setTimeout(() => {
+          window.location.href = 'candidate-dashboard.html';
+        }, 1500);
+      } else {
+        errorMsg.textContent = data.error || 'Login gagal!';
+        errorMsg.style.display = 'block';
+        successMsg.style.display = 'none';
+      }
+    } catch (error) {
+      errorMsg.textContent = 'Terjadi kesalahan: ' + error.message;
+      errorMsg.style.display = 'block';
+      successMsg.style.display = 'none';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Login';
+    }
+  }
+</script>
+
+</body>
+</html>
